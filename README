@@ -1,0 +1,38 @@
+/* 
+This version assumes line mode, where a buffer is passed from the terminal
+program to arduino.
+
+
+To Use as keyboard, flash with keyboard firmware:
+
+a45e60e88017:Ardu z050789$ dfu-programmer atmega16u2 erase
+Checking memory from 0x0 to 0x2FFF...  Not blank at 0x1.
+Erasing flash...  Success
+a45e60e88017:Ardu z050789$ dfu-programmer atmega16u2 flash kbd.hex 
+Checking memory from 0x0 to 0xFFF...  Empty.
+0%                            100%  Programming 0x1000 bytes...
+[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>]  Success
+0%                            100%  Reading 0x3000 bytes...
+[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>]  Success
+Validating...  Success
+0x1000 bytes written into 0x3000 bytes memory (33.33%).
+a45e60e88017:Ardu z050789$ dfu-programmer atmega16u2 reset
+
+
+
+To download new programs, flash with arduino USB firmware
+:
+a45e60e88017:Ardu z050789$ dfu-programmer atmega16u2 erase
+Checking memory from 0x0 to 0x2FFF...  Not blank at 0x1.
+Erasing flash...  Success
+a45e60e88017:Ardu z050789$ dfu-programmer atmega16u2 flash usb.hex 
+Checking memory from 0x0 to 0xFFF...  Empty.
+0%                            100%  Programming 0x1000 bytes...
+[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>]  Success
+0%                            100%  Reading 0x3000 bytes...
+[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>]  Success
+Validating...  Success
+0x1000 bytes written into 0x3000 bytes memory (33.33%).
+a45e60e88017:Ardu z050789$ dfu-programmer atmega16u2 reset
+
+ */
