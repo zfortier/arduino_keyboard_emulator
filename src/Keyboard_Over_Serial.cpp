@@ -1,4 +1,4 @@
-#include "UsbKeyboardMapping.h"
+#include "usbKeyboardMapping.h"
 #include "keyboard_over_serial.h"
 
 int main(void) {
