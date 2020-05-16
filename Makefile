@@ -48,12 +48,28 @@ LIBS               = SoftwareSerial
 ASM_EXPORT         = 0
 DEBUG_FLAG         = 0
 
+
 ### Hardware Settings
-ifeq "$(shell ls /dev/cu.SLAB_USBtoUART &> /dev/null; echo $$?)" "0"
-    MONITOR_PORT       = /dev/cu.SLAB_USBtoUART
+ifneq "$(shell uname)" "Linux"
+    ifeq "$(shell /bin/test -a /dev/cu.SLAB_USBtoUART; echo $$?)" "0"
+        MONITOR_PORT         = /dev/cu.SLAB_USBtoUART
+        AVRDUDE_UART_PORT    = -P /dev/cu.SLAB_USBtoUART
+    else
+        MONITOR_PORT         = /dev/tty.usbmodem*
+        AVRDUDE_USB_PORT     = -P /dev/tty.usbmodem*
+    endif
 else
-    MONITOR_PORT       = /dev/tty.usbmodem*
+    ifeq "$(shell /bin/test -a /dev/ttyUSB0; echo $$?)" "0"
+        MONITOR_PORT         = /dev/ttyUSB0
+        AVRDUDE_UART_PORT    = -P /dev/ttyUSB0
+    else
+        ifeq "0" "$(shell for f in /sys/bus/hid/devices/*; do grep -q 'Arduino Keyboard' $$f/uevent && echo 0 && break; done)"
+	    MONITOR_PORT     = /dev/hidraw2
+            AVRDUDE_USB_PORT = -P /hidraw2
+        endif
+    endif
 endif
+
 ### Set to the board you are currently using.
 ### (i.e BOARD_TAG = uno, mega, etc. & BOARD_SUB = atmega2560, etc.)
 ### Note: for the Arduino Uno, only BOARD_TAG is mandatory.
@@ -62,7 +78,7 @@ BOARD_TAG          = uno
 BOARD_SUB          = 
 
 ### File Paths
-AVR_TOOLS_PATH     = /usr/local/bin
+AVR_TOOLS_PATH     = /bin
 LIB_PATH           = lib
 INCLUDE_PATH       = include
 TARGET             = $(notdir $(subst $(shell echo " "),_,$(PROJECT_DIR)))
@@ -78,10 +94,10 @@ CC                 = $(AVR_TOOLS_PATH)/avr-gcc
 CPP                = $(AVR_TOOLS_PATH)/avr-g++
 OBJCOPY            = $(AVR_TOOLS_PATH)/avr-objcopy
 OBJDUMP            = $(AVR_TOOLS_PATH)/avr-objdump
-AR                 = /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar
+AR                 = $(AVR_TOOLS_PATH)/avr-gcc-ar
 SIZE               = $(AVR_TOOLS_PATH)/avr-size
 NM                 = $(AVR_TOOLS_PATH)/avr-nm
-AVRDUDE            = /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avrdude
+AVRDUDE            = /bin/avrdude
 REMOVE             = rm -rf
 COPY               = cp -f
 ECHO               = printf
@@ -360,8 +376,8 @@ help:
 	@$(ECHO) "\nAvailable targets:\n\
   make                   - compile the code\n\
   make upload            - upload to board using default port (UART, fallback to USB)\n\
-  make uploadUSB         - upload to /dev/tty.usbmodem*\n\
-  make uploadUART        - upload to /dev/cu.SLAB_USBtoUART\n\
+  make uploadUSB         - upload to the usb port\n\
+  make uploadUART        - upload to the UART port\n\
   make eeprom            - upload the eep file\n\
   make clean             - remove all our dependencies\n\
   make depends           - update dependencies\n\
@@ -381,12 +397,6 @@ help:
 # Targets for Uploading to Board            #
 #############################################
 
-ifeq "$(shell ls /dev/cu.SLAB_USBtoUART &> /dev/null; echo $$?)" "0"
-    MONITOR_PORT       = /dev/cu.SLAB_USBtoUART
-else
-    MONITOR_PORT       = /dev/tty.usbmodem*
-endif
-
 GET_MONITOR_PORT       = $(if $(wildcard $(MONITOR_PORT)),              \
                               $(firstword $(wildcard $(MONITOR_PORT))), \
                               $(error Arduino port $(MONITOR_PORT) not found!))
@@ -394,8 +404,6 @@ GET_MONITOR_PORT       = $(if $(wildcard $(MONITOR_PORT)),              \
 AVRDUDE_DEFAULT_OPTS   = -q -v -p $(MCU) -C $(AVRDUDE_CONF) -D \
                            -c $(AVRDUDE_ARD_PROGRAMMER) -b $(AVRDUDE_ARD_BAUDRATE)
 AVRDUDE_DEFAULT_PORT   = -P $(call GET_MONITOR_PORT)
-AVRDUDE_UART_PORT      = -P /dev/cu.SLAB_USBtoUART
-AVRDUDE_USB_PORT       = -P /dev/tty.usbmodem*
 AVRDUDE_UPLOAD_HEX     = -U flash:w:$(TARGET_HEX):i
 AVRDUDE_UPLOAD_EEP     = -U eeprom:w:$(TARGET_EEP):i
 
