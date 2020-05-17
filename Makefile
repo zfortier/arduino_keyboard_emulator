@@ -62,11 +62,14 @@ else
     ifeq "$(shell /bin/test -a /dev/ttyUSB0; echo $$?)" "0"
         MONITOR_PORT         = /dev/ttyUSB0
         AVRDUDE_UART_PORT    = -P /dev/ttyUSB0
-    else
-        ifeq "0" "$(shell for f in /sys/bus/hid/devices/*; do grep -q 'Arduino Keyboard' $$f/uevent && echo 0 && break; done)"
-	    MONITOR_PORT     = /dev/hidraw2
-            AVRDUDE_USB_PORT = -P /hidraw2
-        endif
+    endif
+    ifeq "0" "$(shell for f in /sys/bus/hid/devices/*; do grep -q 'Arduino Keyboard' $$f/uevent && echo 0 && break; done)"
+        MONITOR_PORT         = /dev/hidraw2
+        AVRDUDE_USB_PORT     = -P /hidraw2
+    endif
+    ifeq "$(shell /bin/test -a /dev/ttyACM0; echo $$?)" "0"
+        MONITOR_PORT         = /dev/ttyACM0
+        AVRDUDE_UART_PORT    = -P /dev/ttyACM0
     endif
 endif
 
@@ -229,11 +232,6 @@ LIB_CORE     = $(OBJ_DIR)/libcore.a
 # Implicit Build Rules                      #
 #############################################
 
-# Rather than mess around with VPATH there are quasi-duplicate rules
-# here for building e.g. a system C++ file and a local C++
-# file. Besides making things simpler now, this would also make it
-# easy to change the build options in future
-
 # library sources
 $(OBJ_DIR)/%.cpp.o: $(LIB_PATH)/%.cpp | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
@@ -345,14 +343,6 @@ upload:	$(TARGET_HEX)
 	$(RESET_CMD)
 	$(AVRDUDE) $(AVRDUDE_DEFAULT_OPTS) $(AVRDUDE_DEFAULT_PORT) $(AVRDUDE_UPLOAD_HEX)
 
-uploadUSB: $(TARGET_HEX)
-	$(RESET_CMD)
-	$(AVRDUDE) $(AVRDUDE_DEFAULT_OPTS) $(AVRDUDE_USB_PORT) $(AVRDUDE_UPLOAD_HEX)
-
-uploadUART: $(TARGET_HEX)
-	$(RESET_CMD)
-	$(AVRDUDE) $(AVRDUDE_DEFAULT_OPTS) $(AVRDUDE_UART_PORT) $(AVRDUDE_UPLOAD_HEX)
-
 eeprom:	$(TARGET_HEX) $(TARGET_EEP) $(TARGET_HEX)
 	$(RESET_CMD)
 	$(AVRDUDE) $(AVRDUDE_DEFAULT_OPTS) $(AVRDUDE_UPLOAD_EEP)
@@ -375,9 +365,7 @@ symbol_sizes: $(OBJ_DIR)/$(TARGET).sym
 help:
 	@$(ECHO) "\nAvailable targets:\n\
   make                   - compile the code\n\
-  make upload            - upload to board using default port (UART, fallback to USB)\n\
-  make uploadUSB         - upload to the usb port\n\
-  make uploadUART        - upload to the UART port\n\
+  make upload            - upload to board using default port\n\
   make eeprom            - upload the eep file\n\
   make clean             - remove all our dependencies\n\
   make depends           - update dependencies\n\
