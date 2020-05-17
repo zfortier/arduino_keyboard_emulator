@@ -72,6 +72,7 @@ bash-$ dfu-programmer atmega16u2 reset
 #### To restore the standard arduino USB firmware:
 ```
 bash-$ ./etc/program_usb.sh
+[...]
 ```
 
 or do it manually:
