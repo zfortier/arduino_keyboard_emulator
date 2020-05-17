@@ -38,14 +38,14 @@ noise on the serial connection from a floating ground and treating it as valid
 traffic-- and writing lots of garbage to the output... It's best to just bond
 all of the grounds from each of the 4 silicon boards and avoid any problems.
 
-#### Programming Steps
+### Programming Steps
 
 Connect the Arduino:
   (Arduino 7) -> (UART Tx) 
   (Arduino 8) -> (UART Rx)
   (Arduino Ground) -> (UART Ground) -> (RasPi Ground)
 
-To Use as keyboard, flash with keyboard firmware:
+#### To Use as keyboard, flash with keyboard firmware:
 ```
 bash-$ ./etc/program_keyboard.sh
 [...]
@@ -67,7 +67,7 @@ Validating...  Success
 bash-$ dfu-programmer atmega16u2 reset
 ```
 
-To restore the standard arduino USB firmware:
+#### To restore the standard arduino USB firmware:
 ```
 bash-$ ./etc/program_usb.sh
 ```
