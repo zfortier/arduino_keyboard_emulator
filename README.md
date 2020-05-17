@@ -41,9 +41,11 @@ all of the grounds from each of the 4 silicon boards and avoid any problems.
 ### Programming Steps
 
 Connect the Arduino:
+```
   (Arduino 7) -> (UART Tx) 
   (Arduino 8) -> (UART Rx)
   (Arduino Ground) -> (UART Ground) -> (RasPi Ground)
+```
 
 #### To Use as keyboard, flash with keyboard firmware:
 ```
