@@ -47,6 +47,12 @@ Connect the Arduino:
 
 To Use as keyboard, flash with keyboard firmware:
 ```
+bash-$ ./etc/program_keyboard.sh
+[...]
+```
+
+or do it manaully:
+```
 bash-$ dfu-programmer atmega16u2 erase
 Checking memory from 0x0 to 0x2FFF...  Not blank at 0x1.
 Erasing flash...  Success
@@ -61,7 +67,12 @@ Validating...  Success
 bash-$ dfu-programmer atmega16u2 reset
 ```
 
-To download new programs, flash with arduino USB firmware:
+To restore the standard arduino USB firmware:
+```
+bash-$ ./etc/program_usb.sh
+```
+
+or do it manually:
 ```
 bash-$ dfu-programmer atmega16u2 erase
 Checking memory from 0x0 to 0x2FFF...  Not blank at 0x1.
@@ -75,6 +86,4 @@ Checking memory from 0x0 to 0xFFF...  Empty.
 Validating...  Success
 0x1000 bytes written into 0x3000 bytes memory (33.33%).
 bash-$ dfu-programmer atmega16u2 reset
-
 ```
-
