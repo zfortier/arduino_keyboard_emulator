@@ -55,6 +55,10 @@ bash-$ ./etc/program_keyboard.sh
 
 or do it manaully:
 ```
+bash-$ make clean
+[...]
+bash-$ make
+[...]
 bash-$ dfu-programmer atmega16u2 erase
 Checking memory from 0x0 to 0x2FFF...  Not blank at 0x1.
 Erasing flash...  Success
