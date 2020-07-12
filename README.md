@@ -15,28 +15,25 @@ programming a microcontroller to emulate a USB keyboard, using this set up:
                               |  MCU Board IO Pins <-> MCU Board USB  |
                               +---------------------------------------+
 ```
-Once everything is programmed and connected correctly, you should be able to
-connect to the MCU using a serial terminal program on a PC or laptop. Keyboard
-input to the terminal program will be relayed through the MCU to the target.
-This sounds like an extremely simple setup, and it is.... mostly. There are
-enough 'gotchas' lurking that I felt it was worth the extra effort to package
-everything up into an easily usable bundle, to prevent future headaches.
+The MCU will relay keystrokes from the UART to the USB interface, handling the
+scan code mapping so that the USB port appears as a keyboard (or some type of
+HID) to the OS on the target system.
 
 #### Details
 
-This program allows an Arduino Uno R3 to simulate a USB keyboard on it's USB
-port. The Uno reads it's input from a Software Serial connection, translates to
-the corresponding USB scan code, constructs the IEEE standardized keystroke
-data buffer, and sends that data buffer to the target system via the USB port. 
+This program allows an Arduino Uno to simulate a USB keyboard on it's USB port.
+The Uno reads it's input from a Software Serial connection, translates to the 
+corresponding USB scan code, constructs the IEEE standardized keystroke data
+buffer, and sends that data buffer to the target system via the USB port. 
 
 The input connection to the Arduino is from a computer running a serial
-terminal program, using a UART-USB bridge adapter connected to the USB port.
-The adapters  Rx/Tx pins are wired to the appropriate digital I/O pins on the
-Arduino, and *the ground pin of the bridge adapter bonded to the ground pin on
-the Arduino*. The shared ground is needed to prevent Arduino from picking up
-noise on the serial connection from a floating ground and treating it as valid
-traffic-- and writing lots of garbage to the output... It's best to just bond
-all of the grounds from each of the 4 silicon boards and avoid any problems.
+terminal program, using a UART-USB bridge adapter connected to the computers
+USB port. The adapters Rx/Tx pins are wired to the appropriate digital I/O pins
+on the Arduino, and *the ground pin of the bridge adapter bonded to the ground
+pin on the Arduino*. The shared ground is needed to prevent Arduino from picking
+up noise on the serial connection from a floating ground and treating it as
+valid traffic-- and writing lots of garbage to the output... It's best to just
+bond all of the grounds from each board and avoid problems.
 
 ### Programming Steps
 
@@ -45,7 +42,15 @@ Connect the Arduino:
   (Arduino 7) -> (UART Tx) 
   (Arduino 8) -> (UART Rx)
   (Arduino Ground) -> (UART Ground) -> (RasPi Ground)
+  (Arduino USB) -> (RasPi USB)
 ```
+
+An easy way to tell if things worked is to plug the USB back into the same
+PC used to program the MCU, so both the USB and UART are connected, and open
+a serial terminal emulator and connect to the UART device using unbuffered
+key mode. The first key stroke should start a feedback loop and print forever.
+The OS should also recognize the USB device as a keyboard, or at least as some
+type of HID.
 
 #### To Use as keyboard, flash with keyboard firmware:
 ```
