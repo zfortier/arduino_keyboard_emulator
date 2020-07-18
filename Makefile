@@ -94,7 +94,7 @@ CORE_PATH          = core
 
 ### Executables used throughout the build process
 CC                 = $(AVR_TOOLS_PATH)/avr-gcc
-CPP                = $(AVR_TOOLS_PATH)/avr-g++
+CXX                = $(AVR_TOOLS_PATH)/avr-g++
 OBJCOPY            = $(AVR_TOOLS_PATH)/avr-objcopy
 OBJDUMP            = $(AVR_TOOLS_PATH)/avr-objdump
 AR                 = $(AVR_TOOLS_PATH)/avr-gcc-ar
@@ -132,19 +132,19 @@ HEX_MAXIMUM_SIZE        := $(call PARSE_BOARD,$(BOARD_TAG),$(BOARD_SUB),upload.m
 #############################################
 
 USER_C_SRCS     = $(wildcard *.c) $(wildcard $(USER_SRC_DIR)/*.c)
-USER_CPP_SRCS   = $(wildcard *.cpp) $(wildcard $(USER_SRC_DIR)/*.cpp)
+USER_CXX_SRCS   = $(wildcard *.cpp) $(wildcard $(USER_SRC_DIR)/*.cpp)
 USER_CC_SRCS    = $(wildcard *.cc) $(wildcard $(USER_SRC_DIR)/*.cc)
 USER_AS_SRCS    = $(wildcard *.S) $(wildcard $(USER_SRC_DIR)/*.S)
-USER_SRCS       = $(USER_C_SRCS)   $(USER_CPP_SRCS)  \
+USER_SRCS       = $(USER_C_SRCS)   $(USER_CXX_SRCS)  \
 		      $(USER_CC_SRCS)   $(USER_AS_SRCS)
-USER_OBJ_FILES  = $(USER_C_SRCS:.c=.c.o)   $(USER_CPP_SRCS:.cpp=.cpp.o)  \
+USER_OBJ_FILES  = $(USER_C_SRCS:.c=.c.o)   $(USER_CXX_SRCS:.cpp=.cpp.o)  \
 		      $(USER_CC_SRCS:.cc=.cc.o)   $(USER_AS_SRCS:.S=.S.o)
 USER_OBJS       = $(patsubst $(USER_SRC_DIR)/%, $(OBJ_DIR)/%, $(USER_OBJ_FILES))
 
 CORE_C_SRCS     = $(wildcard $(CORE_PATH)/*.c)
-CORE_CPP_SRCS   = $(wildcard $(CORE_PATH)/*.cpp)
+CORE_CXX_SRCS   = $(wildcard $(CORE_PATH)/*.cpp)
 CORE_AS_SRCS    = $(wildcard $(CORE_PATH)/*.S)
-CORE_OBJ_FILES  = $(CORE_C_SRCS:.c=.c.o) $(CORE_CPP_SRCS:.cpp=.cpp.o) $(CORE_AS_SRCS:.S=.S.o)
+CORE_OBJ_FILES  = $(CORE_C_SRCS:.c=.c.o) $(CORE_CXX_SRCS:.cpp=.cpp.o) $(CORE_AS_SRCS:.S=.S.o)
 CORE_OBJS       = $(patsubst $(CORE_PATH)/%, $(OBJ_DIR)/core/%, $(CORE_OBJ_FILES))
 
 ifeq ($(words $(USER_SRCS)), 0)
@@ -164,17 +164,17 @@ USER_LIBS              = $(shell find $(LIB_PATH) -type d | sed s/^/-I/)  \
                              $(shell find $(INCLUDE_PATH) -type d | sed s/^/-I/)
 CORE_LIBS              = $(shell find $(CORE_PATH) -type d | sed s/^/-I/)
 
-USER_LIB_CPP_SRCS     := $(shell find $(LIB_PATH) -type f -name "*.[cC][pP][pP]" | tr "\n" " ")
+USER_LIB_CXX_SRCS     := $(shell find $(LIB_PATH) -type f -name "*.[cC][pP][pP]" | tr "\n" " ")
 USER_LIB_C_SRCS       := $(shell find $(LIB_PATH) -type f -name "*.[cC]" | tr "\n" " ")
 USER_LIB_AS_SRCS      := $(shell find $(LIB_PATH) -type f -name "*.[sS]" | tr "\n" " ")
-USER_LIB_OBJS         := $(patsubst $(LIB_PATH)/%.cpp, $(OBJ_DIR)/%.cpp.o, $(USER_LIB_CPP_SRCS))  \
+USER_LIB_OBJS         := $(patsubst $(LIB_PATH)/%.cpp, $(OBJ_DIR)/%.cpp.o, $(USER_LIB_CXX_SRCS))  \
                              $(patsubst $(LIB_PATH)/%.c, $(OBJ_DIR)/%.c.o, $(USER_LIB_C_SRCS))    \
                              $(patsubst $(LIB_PATH)/%.S, $(OBJ_DIR)/%.S.o, $(USER_LIB_AS_SRCS))
 
-#CORE_LIB_CPP_SRCS     := $(shell find $(CORE_PATH) -type f -name "*.[cC][pP][pP]" | tr "\n" " ")
+#CORE_LIB_CXX_SRCS     := $(shell find $(CORE_PATH) -type f -name "*.[cC][pP][pP]" | tr "\n" " ")
 #CORE_LIB_C_SRCS       := $(shell find $(CORE_PATH) -type f -name "*.[cC]" | tr "\n" " ")
 #CORE_LIB_AS_SRCS      := $(shell find $(CORE_PATH) -type f -name "*.[sS]" | tr "\n" " ")
-#CORE_LIB_OBJS         := $(patsubst $(CORE_PATH)/%.cpp, $(OBJ_DIR)/%.cpp.o, $(CORE_LIB_CPP_SRCS))  \
+#CORE_LIB_OBJS         := $(patsubst $(CORE_PATH)/%.cpp, $(OBJ_DIR)/%.cpp.o, $(CORE_LIB_CXX_SRCS))  \
 #                             $(patsubst $(CORE_PATH)/%.c, $(OBJ_DIR)/%.c.o, $(CORE_LIB_C_SRCS))    \
 #                             $(patsubst $(CORE_PATH)/%.S, $(OBJ_DIR)/%.S.o, $(CORE_LIB_AS_SRCS))
 
@@ -195,7 +195,7 @@ endif
 COMMON_FLAGS           = -DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION) -DARDUINO_ARCH_AVR -D__PROG_TYPES_COMPAT__    \
                              -mmcu=$(MCU) -I$(CORE_PATH) -I$(INCLUDE_PATH) $(USER_LIBS) $(CORE_LIBS) \
                              -Wall -ffunction-sections -fdata-sections -flto 
-CPPFLAGS               = $(COMMON_FLAGS) -std=c++11 $(OPTIMIZATION_FLAGS) -fpermissive -fno-exceptions 
+CXXFLAGS               = $(COMMON_FLAGS) -std=c++11 $(OPTIMIZATION_FLAGS) -fpermissive -fno-exceptions 
 CFLAGS                 = $(COMMON_FLAGS) -std=gnu11 -fno-fat-lto-objects $(OPTIMIZATION_FLAGS)
 ASFLAGS                = $(COMMON_FLAGS) -x assembler-with-cpp 
 LDFLAGS                = -mmcu=$(MCU) -Wl,--gc-sections -O$(OPTIMIZATION_LEVEL) -flto -fuse-linker-plugin
@@ -203,7 +203,7 @@ SIZEFLAGS              = --mcu=$(MCU)
 
 ifeq "$(ASM_EXPORT)" "1"
     CFLAGS            += -S
-    CPPFLAGS          += -S
+    CXXFLAGS          += -S
 endif
 
 avr_size               = $(SIZE) $(SIZEFLAGS) --format=avr $(1)
@@ -235,7 +235,7 @@ LIB_CORE     = $(OBJ_DIR)/libcore.a
 # library sources
 $(OBJ_DIR)/%.cpp.o: $(LIB_PATH)/%.cpp | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
-	$(CPP) -MMD -c $(CPPFLAGS) $< -o $@
+	$(CXX) -MMD -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.c.o: $(LIB_PATH)/%.c | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
@@ -258,11 +258,11 @@ $(OBJ_DIR)/%.c.o: $(USER_SRC_DIR)/%.c $(COMMON_DEPS) | $(OBJ_DIR)
 
 $(OBJ_DIR)/%.cc.o: $(USER_SRC_DIR)/%.cc $(COMMON_DEPS) | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
-	$(CPP) -MMD -c $(CPPFLAGS) $< -o $@
+	$(CXX) -MMD -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.cpp.o: $(USER_SRC_DIR)/%.cpp $(COMMON_DEPS) | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
-	$(CPP) -MMD -c $(CPPFLAGS) $< -o $@
+	$(CXX) -MMD -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.S.o: $(USER_SRC_DIR)/%.S $(COMMON_DEPS) | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
@@ -279,7 +279,7 @@ $(OBJ_DIR)/core/%.c.o: $(CORE_PATH)/%.c $(COMMON_DEPS) | $(OBJ_DIR)
 
 $(OBJ_DIR)/core/%.cpp.o: $(CORE_PATH)/%.cpp $(COMMON_DEPS) | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
-	$(CPP) -MMD -c $(CPPFLAGS) $< -o $@
+	$(CXX) -MMD -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/core/%.S.o: $(CORE_PATH)/%.S $(COMMON_DEPS) | $(OBJ_DIR)
 	@$(MKDIR) $(dir $@)
