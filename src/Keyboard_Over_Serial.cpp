@@ -1,4 +1,4 @@
-#include "usbKeyboardMapping.h"
+#include "UsbKeyboardMapping.h"
 #include "keyboard_over_serial.h"
 
 int main(void) {
@@ -14,6 +14,7 @@ int main(void) {
   digitalWrite(2, LOW);
   blinkLED(100000, 13);
   blinkLED(100000, 2);
+  
   while(1) {
     // Could save power by sleeping the arduino here, but ehh..
     memset(keyboard_buffer, 0, 8);
