@@ -39,6 +39,7 @@ void blinkLED(uint32_t cycles, uint8_t pinNo) {
 
 
 bool translateInput(unsigned char inputVal, uint8_t *keyboard_buffer) {
+  // this would be better implemented as a hash table, but it doesn't really matter here...
   for(uint16_t mapIdx = 0; mapIdx < keyCount; mapIdx++) {
     if(inputVal == keyboard_map[mapIdx][0]) {
       keyboard_buffer[0] = keyboard_map[mapIdx][1];
