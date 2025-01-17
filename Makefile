@@ -2,6 +2,14 @@
 # Setup Build Environment / Variables       #
 #############################################
 
+# Things you might need to change:
+#   - MONITOR_PORT / AVRDUDE_UART_PORT (see NOTE below)
+#   - BOARD_TAG / BOARD_SUB
+#   - AVR_TOOLS_PATH
+#   - AVRDUDE
+#
+# If you have trouble, look at those values first.
+
 ### Base directory for project
 PROJECT_DIR        = $(shell readlink -f .)
 
@@ -10,6 +18,9 @@ ASM_EXPORT         = 0
 DEBUG_FLAG         = 0
 
 ### Hardware Settings
+# NOTE: You might just want to comment this whole block out and set the values
+# for `MONITOR_PORT` and `AVRDUDE_UART_PORT` manually. This is trying to be fancy
+# and detect if the host OS is Linux or MacOS, but it's really just brittle...
 ifneq "$(shell uname)" "Linux"
     ifeq "0" "$(shell test -a /dev/cu.SLAB_USBtoUART; echo $$?)"
         MONITOR_PORT         = /dev/cu.SLAB_USBtoUART
@@ -52,7 +63,7 @@ BOARD_TAG          = uno
 BOARD_SUB          = 
 
 ### File Paths
-AVR_TOOLS_PATH     = /usr/local/bin
+AVR_TOOLS_PATH     = /usr/bin
 LIB_PATH           = lib
 INCLUDE_PATH       = include
 TARGET             = $(notdir $(subst $(shell echo " "),_,$(PROJECT_DIR)))
@@ -68,15 +79,18 @@ CC                 = $(AVR_TOOLS_PATH)/avr-gcc
 CXX                = $(AVR_TOOLS_PATH)/avr-g++
 OBJCOPY            = $(AVR_TOOLS_PATH)/avr-objcopy
 OBJDUMP            = $(AVR_TOOLS_PATH)/avr-objdump
-AR                 = /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar
+AR                 = $(AVR_TOOLS_PATH)/avr-gcc-ar
 SIZE               = $(AVR_TOOLS_PATH)/avr-size
 NM                 = $(AVR_TOOLS_PATH)/avr-nm
-AVRDUDE            = /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avrdude
+AVRDUDE            = $(AVR_TOOLS_PATH)/avrdude
 REMOVE             = rm -rf
 COPY               = cp -f
 ECHO               = printf
 MKDIR              = mkdir -p
 
+
+###### STOP ######
+# you probably don't need to change anything past here.
 
 #############################################
 # Setup Hardware Variables                  #
